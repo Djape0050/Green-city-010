@@ -9,6 +9,35 @@
   if (window.gcReady) return; // skripta je pozvana i iz <head> i iz <helmet>
   var d = document, root = d.documentElement, isTop = window.parent === window;
 
+  /* ---------- ulazak na sajt uvek počinje od početne ----------
+   * Telefon ume da otvori poslednju gledanu uslugu (sačuvana kartica, dopuna adrese).
+   * Usluga se otvara samo kada se dolazi sa samog sajta ili se korisnik upravo vraća na nju.
+   * Važi samo za objavljen sajt, ne i za .dc.html izvorne stranice u editoru. */
+  if (isTop && !/\.dc\.html$/i.test(location.pathname)) {
+    var AWAY_MS = 30 * 60 * 1000, ACTIVE_KEY = 'gc-active';
+    var isService = /\/usluga[^\/]*$/i.test(location.pathname);
+    var readActive = function () { try { return +sessionStorage.getItem(ACTIVE_KEY) || 0; } catch (e) { return 0; } };
+    var markActive = function () { try { sessionStorage.setItem(ACTIVE_KEY, String(Date.now())); } catch (e) {} };
+    var entry = (performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {};
+    var lastActive = readActive();
+    var away = !!lastActive && Date.now() - lastActive > AWAY_MS;
+    var fromSite = false;
+    try { fromSite = !!document.referrer && new URL(document.referrer).origin === location.origin; } catch (e) {}
+    if (isService) {
+      var returning = (entry.type === 'reload' || entry.type === 'back_forward') && !!lastActive;
+      if (away || !(fromSite || returning)) { location.replace('./'); return; }
+    } else if (location.hash && entry.type === 'navigate' && !fromSite) {
+      history.replaceState(null, '', location.pathname + location.search); // spoljni link ne skače na sredinu stranice
+    }
+    markActive();
+    d.addEventListener('visibilitychange', function () {
+      if (d.visibilityState === 'hidden') { markActive(); return; }
+      if (isService && Date.now() - readActive() > AWAY_MS) location.replace('./');
+      else markActive();
+    });
+    window.addEventListener('pagehide', markActive);
+  }
+
   // Prazan objekat sprečava runtime da ponovo preuzima ceo HTML. Editoru (iframe) je to preuzimanje
   // potrebno, a izvezeni paket već ima svoj __resources, pa se u ta dva slučaja ništa ne menja.
   if (isTop && !window.__resources) window.__resources = {};
