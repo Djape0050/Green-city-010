@@ -91,7 +91,7 @@
 /* END USAGE */
 
 (() => {
-  const STATE_FILE = window.GC_SLOT_STATE || '.image-slots.state.json';
+  const STATE_FILE = '.image-slots.state.json';
 
   // Unsplash terms require visible attribution wherever their photos
   // display, and every link back to unsplash.com must carry utm referral
@@ -171,7 +171,7 @@
 
   function load() {
     if (loadP) return loadP;
-    loadP = fetch(STATE_FILE)
+    loadP = (window.GC_CONFIG ? Promise.resolve({ ok: false }) : fetch(STATE_FILE))
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
         // Merge: sidecar loses to any in-memory change that raced ahead of
@@ -1095,7 +1095,7 @@
       // (Claude wrote it into the HTML) so it passes through unchanged.
       let stored = this.id ? getSlot(this.id) : this._local;
       if (stored && stored.u && !/^data:image\//i.test(stored.u)) stored = null;
-      const srcAttr = this.getAttribute('src') || '';
+      const srcAttr = ((s) => (/\{\{/.test(s) ? '' : s))(this.getAttribute('src') || '');
       this._userUrl = (stored && stored.u) || null;
       const url = this._userUrl || srcAttr;
       // Don't clobber an in-flight reframe with a store-triggered re-render.

@@ -1,15 +1,7 @@
-# GREEN CITY 010 – sajt
+# GREEN CITY 010 – sajt (GitHub Pages)
 
-Statičan sajt, spreman za GitHub Pages. Radi bez spoljnih servisa.
+Gotova verzija sajta za prikaz na https://djape0050.github.io/Green-city-010/ (bez admin panela; stranice imaju noindex).
+Izvorni projekat, sadržaj i admin panel su lokalno; ova verzija se pravi komandama:
 
-## Objavljivanje
-1. Napravite novi repozitorijum na GitHubu i otpremite SVE fajlove iz ovog foldera u koren repozitorijuma, uključujući `.nojekyll` i `.gc-slots.state.json`.
-2. Settings → Pages → Source: **Deploy from a branch**, Branch: **main**, folder **/ (root)** → Save.
-3. Posle 1–2 minuta sajt je dostupan na `https://<korisnik>.github.io/<repozitorijum>/`.
-
-## Fajlovi
-- `index.html` – početna stranica
-- `usluga.html` – stranica pojedinačne usluge (`usluga.html?u=...`)
-- `site-boot.js` – pokretanje stranice i prelazi između stranica
-- `support.js`, `image-slot.js`, `icons.js` – izvršni kod stranica i ikonice
-- `assets/` – stilovi, fontovi, React, logo i fotografije
+    node tools/build.mjs
+    node tools/export-gh-pages.mjs --base /Green-city-010

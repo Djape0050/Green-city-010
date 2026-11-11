@@ -1,0 +1,7 @@
+# Razvojna verzija: domen nije podešen (config/site.json → siteUrl).
+# Sve stranice imaju noindex (meta robots + X-Robots-Tag zaglavlje), pa se ne indeksiraju.
+# Puzanje je namerno dozvoljeno, da bi pretraživači videli noindex.
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
